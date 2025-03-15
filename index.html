@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SLAP Draws Calculator</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
@@ -137,15 +137,6 @@
             transform: translateY(4px);
             box-shadow: 0 0 0 #2E7D32;
         }
-        input {
-            width: 60px;
-            text-align: center;
-            font-size: 1.5em;
-            border: 3px solid #333;
-            border-radius: 8px;
-            padding: 5px;
-            background: white;
-        }
         
         @media (max-width: 480px) {
             .draw-btn {
@@ -165,6 +156,15 @@
                 font-size: 1.2em;
             }
         }
+        input {
+            width: 60px;
+            text-align: center;
+            font-size: 1.5em;
+            border: 3px solid #333;
+            border-radius: 8px;
+            padding: 5px;
+            background: white;
+        }
         .draw-button {
             background: linear-gradient(to bottom, #ff5722, #e64a19);
             color: white;
@@ -181,16 +181,6 @@
             position: relative;
             overflow: hidden;
             -webkit-tap-highlight-color: transparent;
-        }
-        
-        @media (max-width: 480px) {
-            .draw-button {
-                font-size: 1.3em;
-                padding: 10px 20px;
-                margin-left: 0;
-                width: 100%;
-                max-width: 250px;
-            }
         }
         .draw-button:after {
             content: '';
@@ -209,6 +199,16 @@
         }
         .draw-button:hover {
             background: linear-gradient(to bottom, #ff7043, #ff5722);
+        }
+        
+        @media (max-width: 480px) {
+            .draw-button {
+                font-size: 1.3em;
+                padding: 10px 20px;
+                margin-left: 0;
+                width: 100%;
+                max-width: 250px;
+            }
         }
         .cards-container {
             display: flex;
@@ -332,25 +332,6 @@
             position: relative;
             overflow: hidden;
         }
-        
-        @media (max-width: 480px) {
-            .result {
-                font-size: 1.6em;
-                margin-top: 20px;
-                padding: 10px;
-            }
-            
-            .successes-breakdown {
-                flex-direction: column;
-                gap: 5px;
-                margin-top: 10px;
-            }
-            
-            .breakdown-item {
-                width: 80%;
-                margin: 0 auto;
-            }
-        }
         .result:before {
             content: '';
             position: absolute;
@@ -379,6 +360,25 @@
         }
         .breakdown-item.values { color: #ffcc00; }
         .breakdown-item.suits { color: #4CAF50; }
+        
+        @media (max-width: 480px) {
+            .result {
+                font-size: 1.6em;
+                margin-top: 20px;
+                padding: 10px;
+            }
+            
+            .successes-breakdown {
+                flex-direction: column;
+                gap: 5px;
+                margin-top: 10px;
+            }
+            
+            .breakdown-item {
+                width: 80%;
+                margin: 0 auto;
+            }
+        }
         @keyframes drawAnimation {
             0% { transform: scale(0) rotate(-10deg); opacity: 0; }
             60% { transform: scale(1.1) rotate(5deg); opacity: 1; }
@@ -423,6 +423,45 @@
             50% { transform: scale(1.5); opacity: 1; }
             100% { transform: scale(2); opacity: 0; }
         }
+        
+        /* Additional touch-specific styles */
+        .touch-active {
+            opacity: 0.8;
+            transform: scale(0.95);
+        }
+        
+        /* Prevent text selection */
+        * {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        /* Fix for mobile Safari issues */
+        @supports (-webkit-touch-callout: none) {
+            .card, .draw-button, .draw-btn {
+                -webkit-transform: translateZ(0);
+            }
+        }
+        
+        /* Optimize for smaller screens */
+        @media (max-width: 350px) {
+            .card {
+                width: 60px;
+                height: 85px;
+                font-size: 1.2em;
+                margin: 4px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .result {
+                font-size: 1.4em;
+            }
+        }
     </style>
 </head>
 <body>
@@ -442,30 +481,6 @@
     </div>
 
     <script>
-        // Initialize on load
-        window.onload = function() {
-            // Add touch enhancements for mobile devices
-            enableTouchEvents();
-            
-            // Automatically click the draw button once to start
-            calculateSuccess();
-        }
-        
-        // Enhance touch behavior on mobile
-        function enableTouchEvents() {
-            // Add active state for buttons on touch
-            const buttons = document.querySelectorAll('button');
-            buttons.forEach(button => {
-                button.addEventListener('touchstart', function() {
-                    this.classList.add('touch-active');
-                }, { passive: true });
-                
-                button.addEventListener('touchend', function() {
-                    this.classList.remove('touch-active');
-                }, { passive: true });
-            });
-        }
-        
         function incrementDraws() {
             let draws = parseInt(document.getElementById("draws").value);
             if (draws < 8) {
@@ -694,10 +709,6 @@
                 }
             });
             
-            // Log the counts for debugging - using JSON.stringify to properly display objects
-            console.log("Value counts:", JSON.stringify(valueCounts));
-            console.log("Suit counts:", JSON.stringify(suitCounts));
-            
             // Calculate value matches (separate calculation)
             Object.entries(valueCounts).forEach(([value, count]) => {
                 // Skip single cards
@@ -708,8 +719,6 @@
                 if (count === 3) valueMatches += 2;
                 if (count === 4) valueMatches += 3;
                 if (count === 5) valueMatches += 4;
-                
-                console.log(`Found ${count}× value ${value} = ${count === 2 ? 1 : count === 3 ? 2 : count === 4 ? 3 : 4} successes`);
             });
             
             // Calculate suit matches (separate calculation)
@@ -722,8 +731,6 @@
                 if (count === 3) suitMatches += 2;
                 if (count === 4) suitMatches += 3;
                 if (count === 5) suitMatches += 4;
-                
-                console.log(`Found ${count}× suit ${suit} = ${count === 2 ? 1 : count === 3 ? 2 : count === 4 ? 3 : 4} successes`);
             });
             
             // Total successes
