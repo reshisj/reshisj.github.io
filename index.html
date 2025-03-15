@@ -328,6 +328,12 @@
     </div>
 
     <script>
+        // Initialize on load
+        window.onload = function() {
+            // Automatically click the draw button once to start
+            calculateSuccess();
+        }
+        
         function incrementDraws() {
             let draws = parseInt(document.getElementById("draws").value);
             if (draws < 8) {
@@ -467,11 +473,8 @@
                     else if (newValue === 'A') numValue = 14;
                     else numValue = parseInt(newValue);
                     
+                    // Update the drawn cards array with the new card
                     drawnCards[index] = { value: newValue, suit: newSuit, numValue: numValue };
-                    
-                    // Create new card element (instead of modifying the existing one)
-                    let newCard = document.createElement("div");
-                    newCard.classList.add("card", "replaced");
                     
                     // Update card appearance with animation
                     jokerCard.style.transform = "scale(0.8) rotate(10deg)";
@@ -541,13 +544,15 @@
         }
 
         function calculateSuccesses(drawnCards) {
+            // Create separate counters
             let valueCounts = {};
             let suitCounts = {};
-            let successes = 0;
             
-            // For debugging
-            console.log("Calculating successes for:", drawnCards);
+            // Track individual matches
+            let valueMatches = 0;
+            let suitMatches = 0;
             
+            // First just count occurrences
             drawnCards.forEach(card => {
                 if (card.value !== 'Joker') {
                     // Use numeric value for calculation
@@ -557,34 +562,42 @@
                 }
             });
             
-            // Log the counts for debugging
-            console.log("Value counts:", valueCounts);
-            console.log("Suit counts:", suitCounts);
+            // Log the counts for debugging - using JSON.stringify to properly display objects
+            console.log("Value counts:", JSON.stringify(valueCounts));
+            console.log("Suit counts:", JSON.stringify(suitCounts));
             
-            // We moved this counting logic to the results section for better breakdown display
-            
-            let valueMatches = 0;
-            let suitMatches = 0;
-            
-            // Count value matches
-            Object.values(valueCounts).forEach(count => {
+            // Calculate value matches (separate calculation)
+            Object.entries(valueCounts).forEach(([value, count]) => {
+                // Skip single cards
+                if (count < 2) return;
+                
+                // Calculate successes based on count
                 if (count === 2) valueMatches += 1;
                 if (count === 3) valueMatches += 2;
                 if (count === 4) valueMatches += 3;
                 if (count === 5) valueMatches += 4;
+                
+                console.log(`Found ${count}× value ${value} = ${count === 2 ? 1 : count === 3 ? 2 : count === 4 ? 3 : 4} successes`);
             });
             
-            // Count suit matches
-            Object.values(suitCounts).forEach(count => {
+            // Calculate suit matches (separate calculation)
+            Object.entries(suitCounts).forEach(([suit, count]) => {
+                // Skip single cards
+                if (count < 2) return;
+                
+                // Calculate successes based on count
                 if (count === 2) suitMatches += 1;
                 if (count === 3) suitMatches += 2;
                 if (count === 4) suitMatches += 3;
                 if (count === 5) suitMatches += 4;
+                
+                console.log(`Found ${count}× suit ${suit} = ${count === 2 ? 1 : count === 3 ? 2 : count === 4 ? 3 : 4} successes`);
             });
             
             // Total successes
-            successes = valueMatches + suitMatches;
+            let successes = valueMatches + suitMatches;
             
+            // Create result message
             let message = "";
             if (successes === 0) {
                 message = "No successes. Try again!";
@@ -598,10 +611,18 @@
                 message = `${successes} successes! Amazing luck!`;
             }
             
-            // Add breakdown of where successes came from
-            message += `<br><span style="font-size: 0.7em;">(${valueMatches} from values, ${suitMatches} from suits)</span>`;
-            
-            document.getElementById("result").innerHTML = message;
+            // Display detailed breakdown with enhanced UI
+            document.getElementById("result").innerHTML = `
+                <div>${message}</div>
+                <div class="successes-breakdown">
+                    <div class="breakdown-item values">
+                        <span>${valueMatches} from values</span>
+                    </div>
+                    <div class="breakdown-item suits">
+                        <span>${suitMatches} from suits</span>
+                    </div>
+                </div>
+            `;
         }
     </script>
 </body>
