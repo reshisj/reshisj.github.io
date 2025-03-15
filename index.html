@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SLAP Draws Calculator</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
@@ -25,15 +25,24 @@
         }
         .container {
             max-width: 650px;
-            width: 100%;
+            width: calc(100% - 20px);
             background: #fff;
-            padding: 25px;
+            padding: 20px;
             border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), 0 0 0 8px #ffcc00;
             border: 4px solid #333;
             position: relative;
-            margin: 20px;
+            margin: 10px;
             overflow: hidden;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+                border-radius: 15px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4), 0 0 0 5px #ffcc00;
+                border: 3px solid #333;
+            }
         }
         .container:before {
             content: '';
@@ -56,6 +65,14 @@
             position: relative;
             z-index: 1;
         }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2.2em;
+                margin-top: 5px;
+                text-shadow: 2px 2px 0 #333;
+            }
+        }
         h1:after {
             content: "SLAP";
             position: absolute;
@@ -70,6 +87,7 @@
         }
         .controls {
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
             align-items: center;
             margin: 20px 0;
@@ -78,6 +96,19 @@
             border-radius: 15px;
             border: 3px solid #333;
             box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+            gap: 10px;
+        }
+        
+        @media (max-width: 600px) {
+            .controls {
+                flex-direction: column;
+            }
+            
+            .draw-button {
+                margin-left: 0;
+                margin-top: 10px;
+                width: 100%;
+            }
         }
         label {
             font-size: 1.4em;
@@ -100,6 +131,7 @@
             margin: 0 10px;
             box-shadow: 0 4px 0 #2E7D32;
             transition: all 0.1s;
+            -webkit-tap-highlight-color: transparent;
         }
         .draw-btn:active {
             transform: translateY(4px);
@@ -113,6 +145,25 @@
             border-radius: 8px;
             padding: 5px;
             background: white;
+        }
+        
+        @media (max-width: 480px) {
+            .draw-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 1.3em;
+                margin: 0 5px;
+            }
+            
+            input {
+                width: 50px;
+                font-size: 1.3em;
+                padding: 3px;
+            }
+            
+            label {
+                font-size: 1.2em;
+            }
         }
         .draw-button {
             background: linear-gradient(to bottom, #ff5722, #e64a19);
@@ -129,6 +180,17 @@
             margin-left: 20px;
             position: relative;
             overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        @media (max-width: 480px) {
+            .draw-button {
+                font-size: 1.3em;
+                padding: 10px 20px;
+                margin-left: 0;
+                width: 100%;
+                max-width: 250px;
+            }
         }
         .draw-button:after {
             content: '';
@@ -165,7 +227,7 @@
             align-items: center;
             justify-content: center;
             font-size: 1.8em;
-            margin: 10px;
+            margin: 8px;
             border-radius: 15px;
             border: 3px solid #333;
             box-shadow: 0 8px 8px rgba(0, 0, 0, 0.2);
@@ -176,6 +238,31 @@
             transition: all 0.3s;
             background-image: linear-gradient(to bottom right, #ffffff 0%, #f8f8f8 40%, #e9e9e9 100%);
             overflow: hidden;
+        }
+        
+        @media (max-width: 480px) {
+            .card {
+                width: 70px;
+                height: 100px;
+                font-size: 1.4em;
+                margin: 5px;
+                border-radius: 10px;
+                border-width: 2px;
+            }
+            
+            .card-value {
+                font-size: 1.6em !important;
+            }
+            
+            .card-suit {
+                font-size: 1.8em !important;
+                margin-top: 2px !important;
+            }
+            
+            .joker:after {
+                font-size: 0.5em !important;
+                bottom: 5px !important;
+            }
         }
         .card:before {
             content: '';
@@ -245,6 +332,25 @@
             position: relative;
             overflow: hidden;
         }
+        
+        @media (max-width: 480px) {
+            .result {
+                font-size: 1.6em;
+                margin-top: 20px;
+                padding: 10px;
+            }
+            
+            .successes-breakdown {
+                flex-direction: column;
+                gap: 5px;
+                margin-top: 10px;
+            }
+            
+            .breakdown-item {
+                width: 80%;
+                margin: 0 auto;
+            }
+        }
         .result:before {
             content: '';
             position: absolute;
@@ -277,6 +383,14 @@
             0% { transform: scale(0) rotate(-10deg); opacity: 0; }
             60% { transform: scale(1.1) rotate(5deg); opacity: 1; }
             100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        
+        @media (max-width: 480px) {
+            @keyframes drawAnimation {
+                0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+                60% { transform: scale(1.05) rotate(5deg); opacity: 1; }
+                100% { transform: scale(1) rotate(0deg); opacity: 1; }
+            }
         }
         @keyframes jokerAnimation {
             0% { transform: scale(0) rotate(10deg); opacity: 0; }
@@ -330,8 +444,26 @@
     <script>
         // Initialize on load
         window.onload = function() {
+            // Add touch enhancements for mobile devices
+            enableTouchEvents();
+            
             // Automatically click the draw button once to start
             calculateSuccess();
+        }
+        
+        // Enhance touch behavior on mobile
+        function enableTouchEvents() {
+            // Add active state for buttons on touch
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('touchstart', function() {
+                    this.classList.add('touch-active');
+                }, { passive: true });
+                
+                button.addEventListener('touchend', function() {
+                    this.classList.remove('touch-active');
+                }, { passive: true });
+            });
         }
         
         function incrementDraws() {
