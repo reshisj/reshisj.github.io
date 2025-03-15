@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLAP Draws Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Comic Neue', cursive;
+            text-align: center;
+            background-color: #ff9e7d;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            max-width: 650px;
+            width: 100%;
+            background: #fff;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), 0 0 0 8px #ffcc00;
+            border: 4px solid #333;
+            position: relative;
+            margin: 20px;
+            overflow: hidden;
+        }
+        .container:before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #ffcc00;
+            width: 80px;
+            height: 80px;
+            transform: rotate(45deg);
+            z-index: 0;
+        }
+        h1 {
+            font-family: 'Bangers', cursive;
+            color: #ff5722;
+            font-size: 3em;
+            text-shadow: 3px 3px 0 #333;
+            margin-top: 10px;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 1;
+        }
+        h1:after {
+            content: "SLAP";
+            position: absolute;
+            left: 50%;
+            top: -10px;
+            transform: translateX(-50%);
+            font-size: 4em;
+            opacity: 0.04;
+            z-index: -1;
+            letter-spacing: 10px;
+            width: 100%;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            background: linear-gradient(to bottom, #f8f8f8, #e8e8e8);
+            padding: 15px;
+            border-radius: 15px;
+            border: 3px solid #333;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+        label {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .draw-control {
+            display: flex;
+            align-items: center;
+        }
+        .draw-btn {
+            width: 40px;
+            height: 40px;
+            font-size: 1.5em;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0 10px;
+            box-shadow: 0 4px 0 #2E7D32;
+            transition: all 0.1s;
+        }
+        .draw-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #2E7D32;
+        }
+        input {
+            width: 60px;
+            text-align: center;
+            font-size: 1.5em;
+            border: 3px solid #333;
+            border-radius: 8px;
+            padding: 5px;
+            background: white;
+        }
+        .draw-button {
+            background: linear-gradient(to bottom, #ff5722, #e64a19);
+            color: white;
+            cursor: pointer;
+            font-size: 1.5em;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 6px 0 #bf360c, 0 8px 10px rgba(0,0,0,0.2);
+            transition: all 0.1s;
+            font-family: 'Bangers', cursive;
+            letter-spacing: 1px;
+            margin-left: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .draw-button:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: rgba(255,255,255,0.1);
+            border-bottom-right-radius: 50%;
+            border-bottom-left-radius: 50%;
+        }
+        .draw-button:active {
+            transform: translateY(6px);
+            box-shadow: 0 0 0 #d84315;
+        }
+        .draw-button:hover {
+            background: linear-gradient(to bottom, #ff7043, #ff5722);
+        }
+        .cards-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+            min-height: 150px;
+        }
+        .card {
+            width: 90px;
+            height: 130px;
+            background: white;
+            color: black;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            margin: 10px;
+            border-radius: 15px;
+            border: 3px solid #333;
+            box-shadow: 0 8px 8px rgba(0, 0, 0, 0.2);
+            transform: scale(0) rotate(-10deg);
+            animation: drawAnimation 0.5s forwards;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+            background-image: linear-gradient(to bottom right, #ffffff 0%, #f8f8f8 40%, #e9e9e9 100%);
+            overflow: hidden;
+        }
+        .card:before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            z-index: 1;
+        }
+        .card:after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 10px;
+            pointer-events: none;
+        }
+        .card:hover {
+            transform: scale(1.05) rotate(0deg) translateY(-5px) !important;
+            box-shadow: 0 15px 15px rgba(0, 0, 0, 0.3);
+        }
+        .card-value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        .card-suit {
+            font-size: 2.2em;
+            margin-top: 5px;
+        }
+        .joker {
+            background: linear-gradient(135deg, #ff5722, #ffeb3b);
+            color: white;
+            font-weight: bold;
+            transform: scale(0) rotate(10deg);
+            border: 3px dashed #333;
+            animation: pulse 1.5s infinite alternate ease-in-out;
+        }
+        .joker:after {
+            content: "CLICK TO REPLACE!";
+            position: absolute;
+            bottom: 10px;
+            font-family: 'Bangers', cursive;
+            font-size: 0.6em;
+            color: white;
+            text-shadow: 1px 1px 0 #333;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.7), 0 8px 8px rgba(0, 0, 0, 0.2); }
+            100% { box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.9), 0 8px 8px rgba(0, 0, 0, 0.2); }
+        }
+        .result {
+            font-size: 2em;
+            margin-top: 30px;
+            padding: 15px;
+            background: linear-gradient(to right, #333, #444);
+            color: white;
+            border-radius: 12px;
+            font-family: 'Bangers', cursive;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 0 #111;
+            position: relative;
+            overflow: hidden;
+        }
+        .result:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -50%;
+            width: 30%;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            transform: skewX(-30deg);
+            pointer-events: none;
+        }
+        .successes-breakdown {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+            gap: 20px;
+        }
+        .breakdown-item {
+            background: rgba(255,255,255,0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-family: 'Comic Neue', cursive;
+            font-size: 0.6em;
+            display: flex;
+            align-items: center;
+        }
+        .breakdown-item.values { color: #ffcc00; }
+        .breakdown-item.suits { color: #4CAF50; }
+        @keyframes drawAnimation {
+            0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+            60% { transform: scale(1.1) rotate(5deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        @keyframes jokerAnimation {
+            0% { transform: scale(0) rotate(10deg); opacity: 0; }
+            60% { transform: scale(1.1) rotate(-5deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        @keyframes replaceAnimation {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2) rotate(5deg); }
+            100% { transform: scale(1); }
+        }
+        .card.replaced {
+            animation: replaceAnimation 0.5s;
+        }
+        .boom {
+            position: absolute;
+            color: #ff5722;
+            font-size: 3em;
+            font-family: 'Bangers', cursive;
+            text-shadow: 2px 2px 0 #333;
+            opacity: 0;
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+        .boom.show {
+            animation: boomAnimation 0.8s forwards;
+        }
+        @keyframes boomAnimation {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.5); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SLAP Draws Calculator</h1>
+        <div class="controls">
+            <label for="draws">Number of Draws:</label>
+            <div class="draw-control">
+                <button class="draw-btn" onclick="decrementDraws()">-</button>
+                <input type="number" id="draws" min="4" max="8" value="4" readonly>
+                <button class="draw-btn" onclick="incrementDraws()">+</button>
+            </div>
+            <button class="draw-button" onclick="calculateSuccess()">DRAW CARDS!</button>
+        </div>
+        <div class="cards-container" id="cardsContainer"></div>
+        <div class="result" id="result">Ready to draw? Let's go!</div>
+    </div>
+
+    <script>
+        function incrementDraws() {
+            let draws = parseInt(document.getElementById("draws").value);
+            if (draws < 8) {
+                document.getElementById("draws").value = draws + 1;
+            }
+        }
+
+        function decrementDraws() {
+            let draws = parseInt(document.getElementById("draws").value);
+            if (draws > 4) {
+                document.getElementById("draws").value = draws - 1;
+            }
+        }
+
+        function drawCards(numDraws) {
+            let deck = [];
+            for (let i = 2; i <= 14; i++) {
+                let value = i;
+                if (i === 11) value = 'J';
+                if (i === 12) value = 'Q';
+                if (i === 13) value = 'K';
+                if (i === 14) value = 'A';
+                
+                ['♠️', '♦️', '♣️', '♥️'].forEach(suit => {
+                    deck.push({ value: value, suit: suit, numValue: i });
+                });
+            }
+            deck.push({ value: 'Joker', suit: '🃏', numValue: 0 });
+            deck.push({ value: 'Joker', suit: '🃏', numValue: 0 });
+            
+            let drawnCards = [];
+            for (let i = 0; i < numDraws; i++) {
+                let cardIndex = Math.floor(Math.random() * deck.length);
+                drawnCards.push(deck.splice(cardIndex, 1)[0]);
+            }
+            return drawnCards;
+        }
+
+        function calculateSuccess() {
+            let draws = parseInt(document.getElementById("draws").value);
+            let drawnCards = drawCards(draws);
+            document.getElementById("cardsContainer").innerHTML = "";
+            document.getElementById("result").innerHTML = "Drawing cards...";
+            
+            drawnCards.forEach((card, index) => {
+                setTimeout(() => {
+                    let cardDiv = document.createElement("div");
+                    cardDiv.classList.add("card");
+                    
+                    let cardValueDiv = document.createElement("div");
+                    cardValueDiv.classList.add("card-value");
+                    
+                    let cardSuitDiv = document.createElement("div");
+                    cardSuitDiv.classList.add("card-suit");
+                    
+                    if (card.value === 'Joker') {
+                        cardDiv.classList.add("joker");
+                        cardDiv.style.animationName = "jokerAnimation";
+                        cardValueDiv.innerHTML = "Joker";
+                        cardSuitDiv.innerHTML = "🃏";
+                        cardDiv.onclick = () => replaceJoker(cardDiv, drawnCards, index);
+                    } else {
+                        // Set color for red suits
+                        if (card.suit === '♦️' || card.suit === '♥️') {
+                            cardValueDiv.style.color = "#ff5722";
+                            cardSuitDiv.style.color = "#ff5722";
+                        }
+                        cardValueDiv.innerHTML = card.value;
+                        cardSuitDiv.innerHTML = card.suit;
+                    }
+                    
+                    cardDiv.appendChild(cardValueDiv);
+                    cardDiv.appendChild(cardSuitDiv);
+                    document.getElementById("cardsContainer").appendChild(cardDiv);
+                    
+                    // Add fun delay and staggered animation
+                    cardDiv.style.animationDelay = `${index * 0.15}s`;
+                }, 200);
+            });
+            
+            // Calculate after all cards are shown
+            setTimeout(() => {
+                calculateSuccesses(drawnCards);
+            }, (drawnCards.length * 200) + 500);
+        }
+        
+        function replaceJoker(jokerCard, drawnCards, index) {
+            Swal.fire({
+                title: 'Replace Joker Card',
+                html: `
+                    <div style="font-family: 'Comic Neue', cursive; font-size: 1.2em;">
+                        <label>Select Suit:</label>
+                        <select id="suit" style="font-size: 1.2em; padding: 8px; border-radius: 8px; margin: 10px;">
+                            <option value="♠️">♠️ Spades</option>
+                            <option value="♦️">♦️ Diamonds</option>
+                            <option value="♣️">♣️ Clubs</option>
+                            <option value="♥️">♥️ Hearts</option>
+                        </select>
+                        <br>
+                        <label>Select Value:</label>
+                        <select id="value" style="font-size: 1.2em; padding: 8px; border-radius: 8px; margin: 10px;">
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="J">Jack</option>
+                            <option value="Q">Queen</option>
+                            <option value="K">King</option>
+                            <option value="A">Ace</option>
+                        </select>
+                    </div>
+                `,
+                background: '#ffffff',
+                confirmButtonText: 'Replace Card',
+                confirmButtonColor: '#ff5722',
+                showCancelButton: true,
+                cancelButtonColor: '#333',
+                customClass: {
+                    title: 'swal-title',
+                    confirmButton: 'swal-confirm',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let newValue = document.getElementById("value").value;
+                    let newSuit = document.getElementById("suit").value;
+                    let numValue;
+                    
+                    // Convert face cards to numeric values for calculation
+                    if (newValue === 'J') numValue = 11;
+                    else if (newValue === 'Q') numValue = 12;
+                    else if (newValue === 'K') numValue = 13;
+                    else if (newValue === 'A') numValue = 14;
+                    else numValue = parseInt(newValue);
+                    
+                    drawnCards[index] = { value: newValue, suit: newSuit, numValue: numValue };
+                    
+                    // Create new card element (instead of modifying the existing one)
+                    let newCard = document.createElement("div");
+                    newCard.classList.add("card", "replaced");
+                    
+                    // Update card appearance with animation
+                    jokerCard.style.transform = "scale(0.8) rotate(10deg)";
+                    jokerCard.style.opacity = "0.5";
+                    
+                    setTimeout(() => {
+                        // Remove joker styling
+                        jokerCard.classList.remove("joker");
+                        jokerCard.classList.add("replaced");
+                        jokerCard.innerHTML = "";
+                        
+                        // Create the new card contents
+                        let cardValueDiv = document.createElement("div");
+                        cardValueDiv.classList.add("card-value");
+                        
+                        let cardSuitDiv = document.createElement("div");
+                        cardSuitDiv.classList.add("card-suit");
+                        
+                        // Set color for red suits
+                        if (newSuit === '♦️' || newSuit === '♥️') {
+                            cardValueDiv.style.color = "#ff5722";
+                            cardSuitDiv.style.color = "#ff5722";
+                        }
+                        
+                        cardValueDiv.innerHTML = newValue;
+                        cardSuitDiv.innerHTML = newSuit;
+                        
+                        // Add the new contents to the card
+                        jokerCard.appendChild(cardValueDiv);
+                        jokerCard.appendChild(cardSuitDiv);
+                        
+                        // Reset and animate the card
+                        jokerCard.style.opacity = "1";
+                        jokerCard.style.transform = "scale(1.2) rotate(0deg)";
+                        jokerCard.style.boxShadow = "0 0 20px 5px gold";
+                        
+                        // Return to normal size after the animation
+                        setTimeout(() => {
+                            jokerCard.style.transform = "scale(1) rotate(0deg)";
+                            
+                            // Remove highlight after a delay
+                            setTimeout(() => {
+                                jokerCard.style.boxShadow = "";
+                            }, 1000);
+                        }, 300);
+                    }, 200);
+                    
+                    // Add boom effect
+                    const boom = document.createElement("div");
+                    boom.classList.add("boom");
+                    boom.textContent = "POW!";
+                    boom.style.left = Math.random() * 60 - 30 + "px";
+                    boom.style.top = Math.random() * 60 - 30 + "px";
+                    document.querySelector(".cards-container").appendChild(boom);
+                    boom.style.position = "absolute";
+                    boom.style.left = (jokerCard.offsetLeft + 45) + "px";
+                    boom.style.top = (jokerCard.offsetTop + 65) + "px";
+                    boom.style.zIndex = "100";
+                    
+                    setTimeout(() => {
+                        boom.classList.add("show");
+                    }, 300);
+                    
+                    calculateSuccesses(drawnCards);
+                }
+            });
+        }
+
+        function calculateSuccesses(drawnCards) {
+            let valueCounts = {};
+            let suitCounts = {};
+            let successes = 0;
+            
+            // For debugging
+            console.log("Calculating successes for:", drawnCards);
+            
+            drawnCards.forEach(card => {
+                if (card.value !== 'Joker') {
+                    // Use numeric value for calculation
+                    let calcValue = card.numValue || card.value;
+                    valueCounts[calcValue] = (valueCounts[calcValue] || 0) + 1;
+                    suitCounts[card.suit] = (suitCounts[card.suit] || 0) + 1;
+                }
+            });
+            
+            // Log the counts for debugging
+            console.log("Value counts:", valueCounts);
+            console.log("Suit counts:", suitCounts);
+            
+            // We moved this counting logic to the results section for better breakdown display
+            
+            let valueMatches = 0;
+            let suitMatches = 0;
+            
+            // Count value matches
+            Object.values(valueCounts).forEach(count => {
+                if (count === 2) valueMatches += 1;
+                if (count === 3) valueMatches += 2;
+                if (count === 4) valueMatches += 3;
+                if (count === 5) valueMatches += 4;
+            });
+            
+            // Count suit matches
+            Object.values(suitCounts).forEach(count => {
+                if (count === 2) suitMatches += 1;
+                if (count === 3) suitMatches += 2;
+                if (count === 4) suitMatches += 3;
+                if (count === 5) suitMatches += 4;
+            });
+            
+            // Total successes
+            successes = valueMatches + suitMatches;
+            
+            let message = "";
+            if (successes === 0) {
+                message = "No successes. Try again!";
+            } else if (successes === 1) {
+                message = "1 success! Not bad!";
+            } else if (successes === 2) {
+                message = "2 successes! Good job!";
+            } else if (successes === 3) {
+                message = "3 successes! Excellent!";
+            } else {
+                message = `${successes} successes! Amazing luck!`;
+            }
+            
+            // Add breakdown of where successes came from
+            message += `<br><span style="font-size: 0.7em;">(${valueMatches} from values, ${suitMatches} from suits)</span>`;
+            
+            document.getElementById("result").innerHTML = message;
+        }
+    </script>
+</body>
+</html>
